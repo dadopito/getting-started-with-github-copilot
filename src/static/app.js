@@ -12,6 +12,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
       // Clear loading message
       activitiesList.innerHTML = "";
+      // Reset select options to avoid duplicates
+      activitySelect.innerHTML = '<option value="">-- Select an activity --</option>';
 
       // Populate activities list
       Object.entries(activities).forEach(([name, details]) => {
@@ -27,6 +29,33 @@ document.addEventListener("DOMContentLoaded", () => {
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
         `;
 
+        // Participants section (bulleted list)
+        const participantsBlock = document.createElement("div");
+        participantsBlock.className = "participants-block";
+
+        const participantsTitle = document.createElement("p");
+        participantsTitle.className = "participants-title";
+        participantsTitle.innerHTML = "<strong>Participants:</strong>";
+        participantsBlock.appendChild(participantsTitle);
+
+        if (Array.isArray(details.participants) && details.participants.length) {
+          const ul = document.createElement("ul");
+          ul.className = "participants-list";
+          details.participants.forEach((p) => {
+            const li = document.createElement("li");
+            li.className = "participant-item";
+            li.textContent = p;
+            ul.appendChild(li);
+          });
+          participantsBlock.appendChild(ul);
+        } else {
+          const empty = document.createElement("p");
+          empty.className = "no-participants";
+          empty.textContent = "No participants yet";
+          participantsBlock.appendChild(empty);
+        }
+
+        activityCard.appendChild(participantsBlock);
         activitiesList.appendChild(activityCard);
 
         // Add option to select dropdown
@@ -62,6 +91,8 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDiv.textContent = result.message;
         messageDiv.className = "success";
         signupForm.reset();
+        // Refresh to update availability and participants
+        fetchActivities();
       } else {
         messageDiv.textContent = result.detail || "An error occurred";
         messageDiv.className = "error";
